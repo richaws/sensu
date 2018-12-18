@@ -1,0 +1,44 @@
+
+###Copy dockerfiles################
+- name: copy Docekrfiles
+  copy:
+      src: '{{home_dir}}/install-rabbitMQ/files/rabbitMQdockerfiles'
+      dest: /tmp
+      mode: 777
+  with_items:
+      ['Dockerfile','init.sh','Makefile','rabbit']
+
+
+# #####################REMOVE EXISTING CONTAINERS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+# # - name: rm containers
+# #   shell: docker stop $(docker ps -a -q)   &&  docker rm $(docker ps -a -q)
+#  #################################################################################################   
+- name: install make 
+  command: apt-get install make
+
+
+- name: execute dockerfile 
+  make:
+    chdir: /tmp/rabbitMQdockerfiles  
+
+- name: Install pip
+  command: apt-get install python-pip -y
+
+- name: install python docker
+  command: pip install docker
+
+- name: restart docker
+  service:
+    name: docker
+    enabled: yes   
+    state: restarted 
+
+- name: create a rabitMQ container
+  shell: docker run -d -p 5672:5672 --name rabitMQ ansible/awx_rabbitmq
+
+
+
+
+

@@ -1,0 +1,11 @@
+- hosts: server
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  
+  roles:
+   #- install-docker
+   - install-rabbitMQ
+   - install-redis
+   - install-sensu

@@ -1,0 +1,4 @@
+
+rabbitmqctl add_vhost /sensu
+rabbitmqctl add_user sensu 1992
+rabbitmqctl set_permissions -p /sensu sensu ".*" ".*" ".*"

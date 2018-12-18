@@ -1,0 +1,11 @@
+  remote_user: ridma
+  docker_group: docker
+  home_dir: /home/ubuntu/GIT/richrock213/
+
+
+  rabbitmq_host: 127.0.0.1
+  redis_host: 127.0.0.1
+  sensu_client: 127.0.0.1
+
+  sensu_user: sensu
+  sensu_user_pass: 1992

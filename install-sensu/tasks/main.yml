@@ -1,0 +1,121 @@
+---
+# tasks file for install-sensu
+- name: add GPG key
+  shell : wget -O- https://sensu.global.ssl.fastly.net/apt/pubkey.gpg |  apt-key add -
+
+- name: add sensu list
+  copy:
+      src: '{{home_dir}}/install-sensu/files/sensu.list'
+      dest: /etc/apt/sources.list.d/sensu.list
+      mode: 777
+
+- name: update
+  shell: apt-get update -y  &&  sudo apt-get install sensu -y
+  
+
+- name: add rabbitq conf to sensu
+  template:
+      src: '{{home_dir}}/install-sensu/files/rabbitmq.json'
+      dest: /etc/sensu/conf.d/rabbitmq.json
+      mode: 777
+
+- name: add api conf to sensu
+  template:
+      src: '{{home_dir}}/install-sensu/files/api.json'
+      dest: /etc/sensu/conf.d/api.json
+      mode: 777
+
+#######################install and configure sunsu dashboard#############333
+
+- name: add GPG key
+  shell : wget -O- https://sensu.global.ssl.fastly.net/apt/pubkey.gpg | sudo apt-key add -
+
+- name: add uchiwa list
+  copy:
+      src: '{{home_dir}}/install-sensu/files/uchiwa.list'
+      dest: /etc/apt/sources.list.d/uchiwa.list
+      mode: 777
+
+#update and istall uchiwa
+- name: update and install uchiwa
+  shell: apt-get update -y    &&    apt-get install uchiwa -y
+
+- name: add uchiwa config
+  template:
+      src: '{{home_dir}}/install-sensu/files/uchiwa.json'
+      dest: /etc/sensu/uchiwa.json
+      mode: 777
+- name : give permission
+  shell: chmod 777 -R /etc/sensu/uchiwa.json
+
+
+
+- name: install UFW firewall 
+  shell: apt-get install ufw -y      
+
+- name: Enable and Restarting ufw
+  service:
+    name: ufw 
+    enabled: yes   
+    state: restarted 
+
+
+- name: ufw allow 3000
+  shell: ufw allow 3000
+
+
+# adding a sensu client for testing the same server
+- name: add sensu client 
+  template:
+      src: '{{home_dir}}/install-sensu/files/client.json'
+      dest: /etc/sensu/conf.d/client.json
+      mode: 777
+
+- name : give permission
+  shell: chmod 777 -R /etc/sensu/conf.d
+
+# apply changes client 
+- name: restart sensu client
+  shell: systemctl restart sensu-client
+
+
+# restart the Sensu and Uchiwa service and enable them to start on boot time
+
+
+- name: Enable and Restarting sensu-server
+  service:
+    name: sensu-server 
+    enabled: yes   
+    state: restarted  
+
+- name: Enable and Restarting sensu-api
+  service:
+    name: sensu-api 
+    enabled: yes   
+    state: restarted 
+
+- name: Enable and Restarting sensu-client
+  service:
+    name: sensu-client 
+    enabled: yes   
+    state: restarted 
+
+- name: Enable and Restarting uchiwa
+  service:
+    name: uchiwa 
+    enabled: yes   
+    state: restarted 
+
+- name: firewalld
+  shell: apt-get install firewalld
+
+
+
+- name: Enable and Restarting firewalld
+  service:
+    name: firewalld
+    enabled: yes   
+    state: restarted 
+
+- name: firewalld
+  shell: firewall-cmd --permanent --add-port=3000/tcp
